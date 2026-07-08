@@ -116,6 +116,3 @@ collabboard/
 | Ctrl+Z   | Undo             |
 | Ctrl+S   | Save as PNG      |
 
-## License
-
-MIT
