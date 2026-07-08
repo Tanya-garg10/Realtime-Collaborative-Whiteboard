@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Collaborative Whiteboard</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-left">
+      <div class="logo">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+          <rect width="28" height="28" rx="8" fill="#6c63ff"/>
+          <path d="M7 20L11 10L15 16L18 12L21 20H7Z" fill="white" stroke="white" stroke-width="0.5" stroke-linejoin="round"/>
+          <circle cx="20" cy="8" r="2.5" fill="#ffd700"/>
+        </svg>
+        <span class="logo-text">CollabBoard</span>
+      </div>
+      <div class="room-info">
+        <span class="room-label">Room:</span>
+        <span class="room-id" id="roomId">Loading...</span>
+        <button class="btn-icon copy-btn" id="copyRoomBtn" title="Copy room link" aria-label="Copy room link">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="users-indicator" id="usersIndicator" aria-label="Connected users">
+        <div class="users-avatars" id="usersAvatars"></div>
+        <span class="users-count" id="usersCount">0 online</span>
+      </div>
+      <div class="connection-status" id="connectionStatus">
+        <span class="status-dot"></span>
+        <span class="status-text">Connecting...</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Layout -->
+  <div class="app-layout">
+    <!-- Toolbar -->
+    <aside class="toolbar" role="toolbar" aria-label="Drawing tools">
+      <!-- Tools -->
+      <div class="tool-group">
+        <span class="tool-group-label">Tools</span>
+        <button class="tool-btn active" id="toolPen" data-tool="pen" title="Pen (P)" aria-pressed="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 20h9"></path>
+            <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+          </svg>
+          <span>Pen</span>
+        </button>
+        <button class="tool-btn" id="toolHighlighter" data-tool="highlighter" title="Highlighter (H)" aria-pressed="false">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 11l-6 6v3h3l6-6"></path>
+            <path d="M22 2l-3-1-9.5 9.5 3.5 3.5L22 2z"></path>
+          </svg>
+          <span>Highlight</span>
+        </button>
+        <button class="tool-btn" id="toolLine" data-tool="line" title="Line (L)" aria-pressed="false">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <line x1="5" y1="19" x2="19" y2="5"></line>
+          </svg>
+          <span>Line</span>
+        </button>
+        <button class="tool-btn" id="toolRect" data-tool="rect" title="Rectangle (R)" aria-pressed="false">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+          </svg>
+          <span>Rect</span>
+        </button>
+        <button class="tool-btn" id="toolCircle" data-tool="circle" title="Circle (C)" aria-pressed="false">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="9"></circle>
+          </svg>
+          <span>Circle</span>
+        </button>
+        <button class="tool-btn" id="toolEraser" data-tool="eraser" title="Eraser (E)" aria-pressed="false">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 20H7L3 16l10-10 7 7-2.5 2.5"></path>
+            <path d="M6.0 11.0 l6.5 6.5"></path>
+          </svg>
+          <span>Eraser</span>
+        </button>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- Color -->
+      <div class="tool-group">
+        <span class="tool-group-label">Color</span>
+        <div class="color-picker-wrap">
+          <input type="color" id="colorPicker" value="#1a1a2e" aria-label="Pick stroke color" />
+          <span class="color-hex" id="colorHex">#1a1a2e</span>
+        </div>
+        <div class="color-swatches" role="group" aria-label="Color presets">
+          <button class="swatch" style="background:#1a1a2e" data-color="#1a1a2e" aria-label="Dark navy" title="Dark navy"></button>
+          <button class="swatch" style="background:#e74c3c" data-color="#e74c3c" aria-label="Red" title="Red"></button>
+          <button class="swatch" style="background:#3498db" data-color="#3498db" aria-label="Blue" title="Blue"></button>
+          <button class="swatch" style="background:#2ecc71" data-color="#2ecc71" aria-label="Green" title="Green"></button>
+          <button class="swatch" style="background:#f39c12" data-color="#f39c12" aria-label="Orange" title="Orange"></button>
+          <button class="swatch" style="background:#9b59b6" data-color="#9b59b6" aria-label="Purple" title="Purple"></button>
+          <button class="swatch" style="background:#1abc9c" data-color="#1abc9c" aria-label="Teal" title="Teal"></button>
+          <button class="swatch" style="background:#e91e63" data-color="#e91e63" aria-label="Pink" title="Pink"></button>
+          <button class="swatch" style="background:#ffffff" data-color="#ffffff" aria-label="White" title="White" style="border: 1px solid #ccc;"></button>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- Brush Size -->
+      <div class="tool-group">
+        <span class="tool-group-label">Size <span id="sizeLabel">4px</span></span>
+        <input type="range" id="brushSize" min="1" max="50" value="4" class="size-slider" aria-label="Brush size" />
+        <div class="size-preview-wrap">
+          <canvas id="sizePreview" width="60" height="60" aria-hidden="true"></canvas>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- Opacity -->
+      <div class="tool-group">
+        <span class="tool-group-label">Opacity <span id="opacityLabel">100%</span></span>
+        <input type="range" id="opacitySlider" min="10" max="100" value="100" class="size-slider" aria-label="Brush opacity" />
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- Actions -->
+      <div class="tool-group">
+        <span class="tool-group-label">Actions</span>
+        <button class="action-btn" id="undoBtn" title="Undo (Ctrl+Z)" aria-label="Undo">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="9 14 4 9 9 4"></polyline>
+            <path d="M20 20v-7a4 4 0 0 0-4-4H4"></path>
+          </svg>
+          Undo
+        </button>
+        <button class="action-btn" id="clearBtn" title="Clear canvas" aria-label="Clear canvas">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          </svg>
+          Clear
+        </button>
+        <button class="action-btn save-btn" id="saveBtn" title="Save as PNG" aria-label="Save as PNG">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          Save PNG
+        </button>
+      </div>
+    </aside>
+
+    <!-- Canvas Area -->
+    <main class="canvas-area" role="main">
+      <div class="canvas-container" id="canvasContainer">
+        <canvas id="mainCanvas" aria-label="Collaborative whiteboard canvas"></canvas>
+        <!-- Remote cursors layer -->
+        <div class="cursors-layer" id="cursorsLayer" aria-hidden="true"></div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Toast notification -->
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <!-- Clear confirmation modal -->
+  <div class="modal-overlay" id="clearModal" role="dialog" aria-modal="true" aria-labelledby="clearModalTitle" hidden>
+    <div class="modal">
+      <h2 id="clearModalTitle">Clear the canvas?</h2>
+      <p>This will erase everything for all connected users. This cannot be undone.</p>
+      <div class="modal-actions">
+        <button class="btn-secondary" id="cancelClearBtn">Cancel</button>
+        <button class="btn-danger" id="confirmClearBtn">Clear Canvas</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
