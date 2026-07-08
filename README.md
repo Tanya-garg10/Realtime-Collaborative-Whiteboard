@@ -2,8 +2,6 @@
 
 A real-time collaborative whiteboard application where multiple users can draw simultaneously. Built with **Node.js**, **Express**, **Socket.IO**, HTML5 Canvas, and vanilla JavaScript.
 
-![CollabBoard Screenshot](https://via.placeholder.com/800x450.png?text=CollabBoard+Preview)
-
 ## Features
 
 - **Real-time collaboration** — all drawing actions sync instantly across all connected users
